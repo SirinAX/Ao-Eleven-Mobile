@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'add_product.dart';
+import '../screens/add_product.dart';
 import '../widgets/left_drawer.dart';
 import '../widgets/product_card.dart';
 
