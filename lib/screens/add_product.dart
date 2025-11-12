@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'left_drawer.dart';
+import '../widgets/left_drawer.dart';
 
 class AddProductPage extends StatefulWidget {
   const AddProductPage({super.key});

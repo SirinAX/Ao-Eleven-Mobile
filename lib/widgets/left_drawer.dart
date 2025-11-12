@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'menu.dart';
-import 'add_product.dart';
+import '../screens/menu.dart';
+import '../screens/add_product.dart';
 
 class LeftDrawer extends StatelessWidget {
   const LeftDrawer({super.key});
