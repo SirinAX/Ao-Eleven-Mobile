@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import '../widgets/left_drawer.dart';
+import 'dart:convert';
+import 'package:provider/provider.dart';
+import 'package:pbp_django_auth/pbp_django_auth.dart';
+import '../screens/menu.dart';
 
 class AddProductPage extends StatefulWidget {
   const AddProductPage({super.key});
@@ -30,6 +34,7 @@ class _AddProductPageState extends State<AddProductPage> {
 
   @override
   Widget build(BuildContext context) {
+    final request = context.watch<CookieRequest>();
     return Scaffold(
       appBar: AppBar(
         title: const Text("Tambah Produk Baru"),
@@ -154,35 +159,44 @@ class _AddProductPageState extends State<AddProductPage> {
 
               // BUTTON SAVE
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text("Produk Berhasil Ditambahkan!"),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Nama: $_name"),
-                            Text("Harga: $_price"),
-                            Text("Deskripsi: $_description"),
-                            Text("Thumbnail: $_thumbnail"),
-                            Text("Kategori: $_category"),
-                            Text("Featured: $_isFeatured"),
-                            Text("Stok: $_stock"),
-                            Text("Brand: $_brand"),
-                            Text("Rating: $_rating"),
-                          ],
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text("OK"),
-                          ),
-                        ],
-                      ),
+                    // Kirim data ke backend Django
+                    final response = await request.postJson(
+                      "http://localhost:8000/create-flutter/", 
+                      jsonEncode({
+                        "name": _name,
+                        "price": _price,
+                        "description": _description,
+                        "thumbnail": _thumbnail,
+                        "category": _category,
+                        "is_featured": _isFeatured,
+                        "stock": _stock,
+                        "brand": _brand,
+                        "rating": _rating,
+                      }),
                     );
+
+                    if (context.mounted) {
+                      if (response['status'] == 'success') {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Produk berhasil disimpan!"),
+                          ),
+                        );
+                        // Navigasi kembali ke halaman utama
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => MyHomePage()),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Terjadi kesalahan, silakan coba lagi."),
+                          ),
+                        );
+                      }
+                    }
                   }
                 },
                 style: ElevatedButton.styleFrom(
@@ -191,6 +205,7 @@ class _AddProductPageState extends State<AddProductPage> {
                 ),
                 child: const Text("Simpan Produk"),
               ),
+
             ],
           ),
         ),
